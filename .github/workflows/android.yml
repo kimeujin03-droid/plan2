@@ -18,17 +18,22 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: plan-main-ci/package-lock.json
 
       - name: Install dependencies
+        working-directory: plan-main-ci
         run: npm ci
 
       - name: Install Capacitor packages
+        working-directory: plan-main-ci
         run: npm install @capacitor/core @capacitor/cli @capacitor/android --save-dev
 
       - name: Build web app
+        working-directory: plan-main-ci
         run: npm run build:web
 
       - name: Generate Android project (first run safe)
+        working-directory: plan-main-ci
         run: |
           npx cap add android || true
           npx cap sync android
@@ -41,12 +46,12 @@ jobs:
           cache: gradle
 
       - name: Build debug APK
-        working-directory: android
+        working-directory: plan-main-ci/android
         run: ./gradlew assembleDebug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: plan-main-ci/android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
